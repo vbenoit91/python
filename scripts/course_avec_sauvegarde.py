@@ -1,81 +1,65 @@
 import json
 import os.path
+import sys
 
+# RECUPERE LE REPERTOIRE PARENT DE MON SCRIPT
+CUR_DIR = os.path.dirname(__file__)
+# CONCATENATION DE CUR_DIR AVEC la chaine de caractère "liste.json"
+LISTE_PATH = os.path.join(CUR_DIR, "liste.json")
 
-# Vérifier si le fichier json existe ou non, si c'est le cas, tu dois lire le contenu de ce fichier et le stocker dans la variable LISTE afin qu'on puisse modifier la liste existante.
-# Sinon, on part avec une liste vide.
+if os.path.exists(LISTE_PATH):
+    with open(LISTE_PATH, "r") as f:
+        LISTE = json.load(f)
+else:
+    LISTE = []
 
-# Quand l'utilisateur choisir de quitter le programme avec l'option 5, tu dois sauvegarder la liste sur le disque dans le fichier liste.json et l'écraser s'il existe déjà.
+MENU = """Choisissez parmi les 5 options suivantes :
+1: Ajouter un élément à la liste
+2: Retirer un élément de la liste
+3: Afficher la liste
+4: Vider la liste
+5: Quitter
+👉 Votre choix : """
 
-# Pour récupérer le chemin du dossier courant, vous pouvez utiliser cette ligne de code 
-# CUR_DIR = os.path.dirname(__file__)
-
-
-LISTE = []
-chemin = "./liste.json"
-
-# Le programme permet de réaliser 5 actions
+MENU_CHOICES = ["1", "2", "3", "4", "5"]
 
 while True:
-    if os.path.exists(chemin) is True:
-        print("1: Ajouter un élément à la liste\n2: Retirer un élément de la liste\n3: Afficher la liste\n4: Vider la liste\n5: Quitter")
-        user_choice = input("👉 Votre choix : ")
-        with open(chemin, "r") as f:
-            LISTE = json.load(f)
-
-        # 1 - Ajouter un élément à la liste de courses        
-        if user_choice == "1":
-            add = input("Entrez le nom d'un élément à ajouter à la liste de courses : ")
-  
-            if add not in LISTE:
-                LISTE.append(add.capitalize())
-                with open(chemin, "w") as f:
-                    json.dump(LISTE, f, indent=4)
-                print(f"L'élément {add} a bien été ajouté de la liste.")
-            else:
-                print(f"❌ L'élément {add} est déjà présent dans votre liste.")
-
-        # 2 - Retirer un élément de la liste de courses
-        elif user_choice == "2":
-            delete = input("Entrez le nom d'un élément à retirer de la liste de courses : ")
-
-            if delete in LISTE:
-                LISTE.remove(delete)
-                with open(chemin, "w") as f:
-                    json.dump(LISTE, f, indent=4)
-                print(f"L'élément {delete} a bien été supprimé de la liste.")
-            else:
-                print(f"❌ L'élément {delete} n'éxiste pas dans votre liste. Veuillez saisir un élément éxistant.")
-
-        # 3 - Afficher les éléments de la liste de courses
-        elif user_choice == "3":
-            print("Voici le contenu de votre liste : ")
-            if LISTE:
-                for index, value in enumerate(LISTE, 1):
-                    print(f"{index}. {value}")
-
-        # 4 - Vider la liste de courses
-        elif user_choice == "4":
-            LISTE.clear()
-            # ou
-            # with open(chemin, "w") as f:
-            #     json.dump([], f, indent=4)
-            print("La liste a été vidée de son contenu.")
-
-        # 5 - Quitter le programme
-        elif user_choice == "5":
-            print("A bientôt !")
-            exit()
-
+    user_choice = ""
+    while user_choice not in MENU_CHOICES:
+        user_choice = input(MENU)
+        if user_choice not in MENU_CHOICES:
+            print("Veuillez choisir une option valide...")
+        
+    # 1 - Ajouter un élément à la liste de courses        
+    if user_choice == "1":
+        item = input("Entrez le nom d'un élément à ajouter à la liste de courses : ")
+        LISTE.append(item)
+        print(f"L'élément {item} a bien été ajouté de la liste.")
+    # 2 - Retirer un élément de la liste de courses
+    elif user_choice == "2":
+        item = input("Entrez le nom d'un élément à retirer de la liste de courses : ")
+        if item in LISTE:
+            LISTE.remove(item)
+            print(f"L'élément {item} a bien été supprimé de la liste.")
         else:
-            print("Veuillez saisir un chiffre compris entre 1 et 5")        
-            continue
-
-    else: 
-        open("./liste.json", "w")
-        with open(chemin, "w") as f:
-            json.dump([], f, indent=4)
+            print(f"❌ L'élément {item} n'éxiste pas dans votre liste. Veuillez saisir un élément éxistant.")
+    # 3 - Afficher les éléments de la liste de courses
+    elif user_choice == "3":
+        print("Voici le contenu de votre liste : ")
+        if LISTE:
+            for index, value in enumerate(LISTE, 1):
+                print(f"{index}. {value}")
+        else:
+            print("❌ Votre liste ne contient au élément.")
+    # 4 - Vider la liste de courses
+    elif user_choice == "4":
+        LISTE.clear()
+        print("La liste a été vidée de son contenu.")
+    # 5 - Quitter le programme
+    elif user_choice == "5":
+        with open(LISTE_PATH, "w") as f:
+            json.dump(LISTE, f, indent=4)
+        print("A bientôt !")
+        sys.exit()
 
     print("-"*50)
-
-        
